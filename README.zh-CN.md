@@ -1,69 +1,122 @@
+<div align="center">
+
 # CopyAsPath
 
-在 Windows 资源管理器中复制文件或文件夹的绝对路径。
+**从 Windows 资源管理器右键复制文件或文件夹的绝对路径。**
+
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white)](https://github.com/xyhongwithcode/CopyAsPath)
+[![License](https://img.shields.io/github/license/xyhongwithcode/CopyAsPath?style=flat-square)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/xyhongwithcode/CopyAsPath?style=flat-square)](https://github.com/xyhongwithcode/CopyAsPath/releases)
 
 [English](README.md)
 
+</div>
+
+## 为什么需要 CopyAsPath？
+
+Windows 10 自带的路径复制方式是 **Shift + 右键 → 复制为路径**。CopyAsPath 把常用操作做得更直接：
+
+- 右键菜单直接提供 **复制绝对路径**。
+- 资源管理器快捷键：<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd>。
+- 支持文件、文件夹、文件夹空白处和驱动器。
+- 按当前用户安装，无需管理员权限。
+
+> **Windows 11 说明：** Windows 11 已自带 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd>（22463 及以上版本）以及右键菜单中的 **复制为路径**。本项目主要面向 Windows 10，但在 Windows 11 上也可以使用，用于统一经典菜单入口和 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> 快捷键。
+
 ## 功能
 
-- 右键菜单增加 **复制绝对路径**，支持：
-  - 文件
-  - 文件夹
-  - 文件夹空白处（复制当前文件夹路径）
-  - 驱动器（复制根目录，例如 `C:\`）
-- 在资源管理器中按 `Ctrl+Alt+C`，复制所有选中项的路径。
-- 资源管理器中没有选中项时，`Ctrl+Alt+C` 复制当前文件夹路径。
-- 按用户安装，无需管理员权限。
-- 不联网、不收集遥测、不读取文件内容。
+| 功能 | 说明 |
+| --- | --- |
+| 右键菜单 | 右键文件、文件夹、文件夹空白处或驱动器，选择 **复制绝对路径** |
+| 快捷键 | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> 复制所有选中路径 |
+| 文件夹回退 | 没有选中项时，快捷键复制当前文件夹路径 |
+| 多选 | 快捷键按每行一个路径复制 |
+| 无控制台闪窗 | 右键菜单通过隐藏的 WScript 启动器调用 |
+| 按用户安装 | 只写入 `HKCU` 和 `%LOCALAPPDATA%` |
 
 ## 系统要求
 
-- Windows 10 或 Windows 11
+- Windows 10（主要目标）或 Windows 11
 - Windows PowerShell 5.1（Windows 自带）
 - Windows Script Host（`wscript.exe`，Windows 自带）
 
 ## 安装
 
-1. 下载本仓库的 ZIP，或克隆仓库。
-2. 双击 `Install.cmd`。
+### 方式一：下载 ZIP
 
-安装程序会：
+1. 下载最新发布版，或点击 **Code → Download ZIP**。
+2. 解压压缩包。
+3. 双击 `Install.cmd`。
 
-- 将运行文件复制到 `%LOCALAPPDATA%\CopyAsPath`
-- 在 `HKCU\Software\Classes` 下添加当前用户的右键菜单项
-- 创建开机启动快捷方式，并启动 `Ctrl+Alt+C` 后台监听进程
+### 方式二：克隆仓库
 
-正常情况下不会弹出管理员权限提示。如果 Windows SmartScreen 对下载的 `.cmd` 文件发出警告，请先检查源码，然后选择“更多信息 > 仍要运行”。
+```powershell
+git clone https://github.com/xyhongwithcode/CopyAsPath.git
+cd CopyAsPath
+.\Install.cmd
+```
+
+正常情况下不会弹出管理员权限提示。如果 SmartScreen 对下载的 `.cmd` 文件发出警告，请先检查源码，然后选择 **更多信息 → 仍要运行**。
 
 ## 使用
 
-右键单击文件、文件夹、驱动器或文件夹空白处，选择 **复制绝对路径**。
+### 右键菜单
 
-在资源管理器中选中一个或多个项目，按 `Ctrl+Alt+C`，路径会按每行一个复制到剪贴板。
+右键单击文件、文件夹、文件夹空白处或驱动器，选择 **复制绝对路径**。
+
+- Windows 10：直接显示在普通右键菜单中。
+- Windows 11：位于 **显示更多选项** 中，也可以按 <kbd>Shift</kbd> + <kbd>F10</kbd> 打开经典菜单。
+
+### 快捷键
+
+| 操作 | 结果 |
+| --- | --- |
+| 选中项目后按 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> | 复制所有选中路径，每行一个 |
+| 没有选中项时按 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> | 复制当前文件夹路径 |
+
+快捷键仅在资源管理器位于前台时注册。
+
+## 安装程序会修改什么
+
+| 项目 | 位置 |
+| --- | --- |
+| 运行文件 | `%LOCALAPPDATA%\CopyAsPath` |
+| 右键菜单项 | `HKCU\Software\Classes\*\shell\CopyAsPath`<br>`HKCU\Software\Classes\Directory\shell\CopyAsPath`<br>`HKCU\Software\Classes\Directory\Background\shell\CopyAsPath`<br>`HKCU\Software\Classes\Drive\shell\CopyAsPath` |
+| 开机启动快捷方式 | `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CopyAsPath.lnk` |
+| 后台进程 | 隐藏的 PowerShell 快捷键监听进程 |
 
 ## 卸载
 
-双击 `Uninstall.cmd`。
+双击 `Uninstall.cmd`，或运行：
 
-它会删除右键菜单项、开机启动快捷方式、后台快捷键进程，以及 `%LOCALAPPDATA%\CopyAsPath` 下的安装文件。
+```powershell
+powershell -ExecutionPolicy Bypass -File .\CopyAsPath.ps1 -Uninstall
+```
 
-## Windows 11 右键菜单
-
-Windows 11 会把这类传统注册表菜单项放在 **显示更多选项** 中。也可以按 `Shift+F10`，或使用 `Shift + 右键` 直接打开经典菜单。
-
-Windows 10 会直接在普通右键菜单中显示。
+它会删除右键菜单项、开机启动快捷方式、后台进程和安装文件。
 
 ## 实现方式
 
-- `CopyAsPath.ps1` 负责安装和管理当前用户级别的集成。
-- 右键菜单通过 `wscript.exe` 调用 `CopyAsPathMenu.vbs`，再由它用隐藏窗口启动 PowerShell，避免直接启动 `powershell.exe` 时控制台窗口闪一下的问题。
-- 快捷键监听进程在后台运行，仅在资源管理器位于前台时注册 `Ctrl+Alt+C`。
+1. `CopyAsPath.ps1` 将自身和生成的 VBS 启动器复制到 `%LOCALAPPDATA%\CopyAsPath`。
+2. 右键菜单通过 `wscript.exe` 运行 VBS 启动器。
+3. 启动器使用 `SW_HIDE` 启动 PowerShell，因此不会闪控制台窗口。
+4. 快捷键监听进程仅在资源管理器处于前台时注册 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd>。
 
-## 说明
+## 常见问题
 
-- 右键菜单按单项选择设计；需要复制多个选中项时请使用 `Ctrl+Alt+C`。
-- 如果 `Ctrl+Alt+C` 和其他软件冲突，可修改 `CopyAsPath.ps1` 中的 `$hotkeyModifiers` 和 `$hotkeyVirtualKey`，然后重新安装。
-- 菜单文字默认为中文；如需修改，请编辑 `CopyAsPath.ps1` 中的 `SetValue('', '复制绝对路径', ...)` 调用。
+| 问题 | 解决方法 |
+| --- | --- |
+| Windows 11 中看不到菜单项 | 使用 **显示更多选项** 或 <kbd>Shift</kbd> + <kbd>F10</kbd>；传统注册表菜单项不会显示在精简菜单中 |
+| 快捷键没有反应 | 确认资源管理器处于前台；`Ctrl` + `Alt` + `C` 可能被其他软件占用 |
+| 想换一个快捷键 | 修改 `CopyAsPath.ps1` 中的 `$hotkeyModifiers` 和 `$hotkeyVirtualKey`，然后重新安装 |
+| 想改菜单文字 | 修改 `CopyAsPath.ps1` 中的 `SetValue('', '复制绝对路径', ...)` 调用 |
+
+## 安全与隐私
+
+- 不联网。
+- 不收集遥测。
+- 不读取文件内容。
+- 只将选中的路径字符串写入剪贴板。
 
 ## 许可证
 
