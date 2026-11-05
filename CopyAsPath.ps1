@@ -14,12 +14,12 @@ param(
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 
-$appName = 'CopyAbsolutePath'
-$installDir = Join-Path $env:LOCALAPPDATA 'CopyPath'
-$installedScript = Join-Path $installDir 'CopyPath.ps1'
-$menuLauncher = Join-Path $installDir 'CopyPathMenu.vbs'
+$appName = 'CopyAsPath'
+$installDir = Join-Path $env:LOCALAPPDATA 'CopyAsPath'
+$installedScript = Join-Path $installDir 'CopyAsPath.ps1'
+$menuLauncher = Join-Path $installDir 'CopyAsPathMenu.vbs'
 $pidFile = Join-Path $installDir 'hotkey.pid'
-$startupLink = Join-Path ([Environment]::GetFolderPath('Startup')) 'CopyAbsolutePath.lnk'
+$startupLink = Join-Path ([Environment]::GetFolderPath('Startup')) 'CopyAsPath.lnk'
 $powerShellExe = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
 $hotkeyId = 0x5245
 $hotkeyModifiers = 0x0003
@@ -35,7 +35,7 @@ If WScript.Arguments.Count = 0 Then WScript.Quit 1
 
 Set shell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
-scriptPath = fso.BuildPath(fso.GetParentFolderName(WScript.ScriptFullName), "CopyPath.ps1")
+scriptPath = fso.BuildPath(fso.GetParentFolderName(WScript.ScriptFullName), "CopyAsPath.ps1")
 
 command = Chr(34) & shell.ExpandEnvironmentStrings("%SystemRoot%") & "\System32\WindowsPowerShell\v1.0\powershell.exe" & Chr(34) & _
           " -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File " & Quote(scriptPath) & " -Copy"
@@ -63,7 +63,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-public static class CopyPathNative
+public static class CopyAsPathNative
 {
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
@@ -317,7 +317,7 @@ function Invoke-HotkeyHost {
         New-Item -ItemType Directory -Path $installDir -Force | Out-Null
     }
 
-    $mutex = New-Object System.Threading.Mutex($false, 'Local\CopyAbsolutePath.Hotkey')
+    $mutex = New-Object System.Threading.Mutex($false, 'Local\CopyAsPath.Hotkey')
     $hasMutex = $false
     try {
         try {
@@ -332,36 +332,36 @@ function Invoke-HotkeyHost {
         $nextRegistrationAttempt = [DateTime]::MinValue
         try {
             while ($true) {
-                $foreground = [CopyPathNative]::GetForegroundWindow()
-                $windowClass = [CopyPathNative]::ClassNameOf($foreground)
+                $foreground = [CopyAsPathNative]::GetForegroundWindow()
+                $windowClass = [CopyAsPathNative]::ClassNameOf($foreground)
                 $isExplorer = $explorerClasses -contains $windowClass
 
                 if ($isExplorer -and -not $registered -and [DateTime]::UtcNow -ge $nextRegistrationAttempt) {
-                    $registered = [CopyPathNative]::RegisterHotKey([IntPtr]::Zero, $hotkeyId, $hotkeyModifiers, $hotkeyVirtualKey)
+                    $registered = [CopyAsPathNative]::RegisterHotKey([IntPtr]::Zero, $hotkeyId, $hotkeyModifiers, $hotkeyVirtualKey)
                     if (-not $registered) {
                         $nextRegistrationAttempt = [DateTime]::UtcNow.AddSeconds(2)
                     }
                 } elseif (-not $isExplorer -and $registered) {
-                    [void][CopyPathNative]::UnregisterHotKey([IntPtr]::Zero, $hotkeyId)
+                    [void][CopyAsPathNative]::UnregisterHotKey([IntPtr]::Zero, $hotkeyId)
                     $registered = $false
                     $nextRegistrationAttempt = [DateTime]::MinValue
                 }
 
-                $message = New-Object 'CopyPathNative+NativeMessage'
-                while ([CopyPathNative]::TryPeekMessage([ref]$message)) {
+                $message = New-Object 'CopyAsPathNative+NativeMessage'
+                while ([CopyAsPathNative]::TryPeekMessage([ref]$message)) {
                     if (($message.message -eq $wmHotkey) -and ($message.wParam.ToInt32() -eq $hotkeyId)) {
                         $paths = @(Get-SelectedExplorerPaths -WindowHandle $foreground -WindowClass $windowClass)
                         if ($paths.Count -gt 0) {
                             Copy-PathText -Paths $paths
                         }
                     }
-                    $message = New-Object 'CopyPathNative+NativeMessage'
+                    $message = New-Object 'CopyAsPathNative+NativeMessage'
                 }
                 Start-Sleep -Milliseconds 60
             }
         } finally {
             if ($registered) {
-                [void][CopyPathNative]::UnregisterHotKey([IntPtr]::Zero, $hotkeyId)
+                [void][CopyAsPathNative]::UnregisterHotKey([IntPtr]::Zero, $hotkeyId)
             }
             Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue
         }
@@ -410,8 +410,8 @@ if ($Install -or $InstallMenu -or $InstallHotkey) {
 }
 
 Write-Output '用法：'
-Write-Output '  CopyPath.ps1 -Install          安装右键菜单和快捷键（含开机启动）'
-Write-Output '  CopyPath.ps1 -InstallMenu      只安装右键菜单'
-Write-Output '  CopyPath.ps1 -InstallHotkey    只安装快捷键和开机启动'
-Write-Output '  CopyPath.ps1 -Uninstall        全部卸载'
-Write-Output '  CopyPath.ps1 -Copy PATH        复制指定路径到剪贴板'
+Write-Output '  CopyAsPath.ps1 -Install          安装右键菜单和快捷键（含开机启动）'
+Write-Output '  CopyAsPath.ps1 -InstallMenu      只安装右键菜单'
+Write-Output '  CopyAsPath.ps1 -InstallHotkey    只安装快捷键和开机启动'
+Write-Output '  CopyAsPath.ps1 -Uninstall        全部卸载'
+Write-Output '  CopyAsPath.ps1 -Copy PATH        复制指定路径到剪贴板'

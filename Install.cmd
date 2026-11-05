@@ -1,4 +1,4 @@
 @echo off
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0CopyPath.ps1" -Install
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0CopyAsPath.ps1" -Install
 echo.
 pause

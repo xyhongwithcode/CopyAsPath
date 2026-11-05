@@ -1,4 +1,4 @@
-# CopyPathTool
+# CopyAsPath
 
 Copy absolute file and folder paths from Windows File Explorer.
 
@@ -29,7 +29,7 @@ Copy absolute file and folder paths from Windows File Explorer.
 
 The installer:
 
-- copies the runtime files to `%LOCALAPPDATA%\CopyPath`
+- copies the runtime files to `%LOCALAPPDATA%\CopyAsPath`
 - adds per-user context-menu entries under `HKCU\Software\Classes`
 - creates a startup shortcut and starts the `Ctrl+Alt+C` listener
 
@@ -45,7 +45,7 @@ In File Explorer, select one or more items and press `Ctrl+Alt+C`. The selected 
 
 Double-click `Uninstall.cmd`.
 
-This removes the context-menu entries, the startup shortcut, the background hotkey process, and the installed files under `%LOCALAPPDATA%\CopyPath`.
+This removes the context-menu entries, the startup shortcut, the background hotkey process, and the installed files under `%LOCALAPPDATA%\CopyAsPath`.
 
 ## Windows 11 context menu
 
@@ -55,15 +55,15 @@ Windows 10 shows the entry directly in the normal context menu.
 
 ## How it works
 
-- `CopyPath.ps1` installs and manages the per-user integration.
-- The context menu launches `CopyPathMenu.vbs` through `wscript.exe`, which starts PowerShell with a hidden window. This avoids the console-window flash caused by launching `powershell.exe` directly.
+- `CopyAsPath.ps1` installs and manages the per-user integration.
+- The context menu launches `CopyAsPathMenu.vbs` through `wscript.exe`, which starts PowerShell with a hidden window. This avoids the console-window flash caused by launching `powershell.exe` directly.
 - The hotkey listener runs in the background and registers `Ctrl+Alt+C` only while File Explorer is the foreground application.
 
 ## Notes
 
 - The context menu is intended for a single selection. Use `Ctrl+Alt+C` to copy multiple selected paths.
-- If `Ctrl+Alt+C` conflicts with another application, change `$hotkeyModifiers` and `$hotkeyVirtualKey` in `CopyPath.ps1`, then reinstall.
-- The menu label is Chinese by default; edit the `SetValue('', '复制绝对路径', ...)` calls in `CopyPath.ps1` to change it.
+- If `Ctrl+Alt+C` conflicts with another application, change `$hotkeyModifiers` and `$hotkeyVirtualKey` in `CopyAsPath.ps1`, then reinstall.
+- The menu label is Chinese by default; edit the `SetValue('', '复制绝对路径', ...)` calls in `CopyAsPath.ps1` to change it.
 
 ## License
 
